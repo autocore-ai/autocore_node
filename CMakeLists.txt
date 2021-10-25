@@ -5,6 +5,6 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(${PROJECT_NAME} SHARED src/autocore_node.cpp)
+ament_auto_add_library(${PROJECT_NAME} SHARED src/node.cpp)
 
 ament_auto_package()

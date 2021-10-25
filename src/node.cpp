@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <autocore_node/autocore_node.hpp>
+#include <autocore_node/node.hpp>
 
-AutoCoreNode::AutoCoreNode(const std::string & node_name, const rclcpp::NodeOptions & options, const NodeType type)
-: Node(node_name, options), node_type(type)
+namespace autocore
+{
+Node::Node(
+  const std::string & node_name, const rclcpp::NodeOptions & options, const NodeType node_type)
+: rclcpp::Node(node_name, options), nodeType(node_type)
 {
 }
 
-AutoCoreNode::AutoCoreNode(const std::string & node_name, const NodeType type)
-: Node(node_name), node_type(type)
+Node::Node(const std::string & node_name, const NodeType node_type)
+: rclcpp::Node(node_name), nodeType(node_type)
 {
 }
 
-bool AutoCoreNode::IsROS() { return NodeType::ROS == node_type; }
+NodeType Node::GetNodeType(){ return nodeType; }
 
-bool AutoCoreNode::IsZenohFlow() { return NodeType::ZenohFlow == node_type; }
+bool Node::IsROS() { return NodeType::ROS == nodeType; }
+
+bool Node::IsZenohFlow() { return NodeType::ZenohFlow == nodeType; }
+
+}  // namespace autocore

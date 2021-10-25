@@ -14,22 +14,11 @@
 
 #pragma once
 
-#include <rclcpp/node.hpp>
-
+namespace autocore
+{
 enum NodeType {
+  Default = 1,
   ROS = 0,
   ZenohFlow = 1,
 };
-
-class AutoCoreNode : public rclcpp::Node
-{
-public:
-  explicit AutoCoreNode(const std::string & node_name, const NodeType node_type = NodeType::ZenohFlow);
-  explicit AutoCoreNode(const std::string & node_name, const rclcpp::NodeOptions & options, const NodeType node_type = NodeType::ROS);
-
-  bool IsROS();
-  bool IsZenohFlow();
-
-protected:
-  const NodeType node_type;
-};
+};  // namespace autocore
