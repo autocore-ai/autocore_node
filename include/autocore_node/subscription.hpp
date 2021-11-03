@@ -23,13 +23,14 @@ template <
   typename CallbackMessageT,
   typename AllocatorT = std::allocator<void>,
   typename MessageMemoryStrategyT =
-    rclcpp::message_memory_strategy::MessageMemoryStrategy<CallbackMessageT, AllocatorT>>
+    rclcpp::message_memory_strategy::MessageMemoryStrategy<CallbackMessageT, AllocatorT>,
+  typename SharedPtrCallback = std::function<void(const std::shared_ptr<CallbackMessageT>)>>
 class Subscription
 {
 public:
   RCLCPP_SMART_PTR_DEFINITIONS(Subscription)
 
-  Subscription() : nodeType(NodeType::ZenohFlow) {}
+  Subscription() : nodeType(NodeType::ZenohFlow), any_subscription_callback_(allocator_) {}
   Subscription(const std::shared_ptr<
                rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>> ros_sub)
   : nodeType(NodeType::ROS), p_ros_sub(ros_sub)
@@ -41,20 +42,27 @@ public:
     message = msg;
     if (nodeType == NodeType::ZenohFlow) {
       rclcpp::MessageInfo msg_info;
-      any_subscription_callback.dispatch(std::make_shared<CallbackMessageT>(message), msg_info);
+      // any_subscription_callback_.dispatch(std::make_shared<CallbackMessageT>(message), msg_info);
     }
   }
 
-  template <typename CallbackT> void setCallback(CallbackT && callback)
+  template <
+    typename CallbackT,
+    typename std::enable_if<
+      rclcpp::function_traits::same_arguments<CallbackT, SharedPtrCallback>::value>::type * =
+      nullptr>
+  void setCallback(CallbackT && callback)
   {
-    any_subscription_callback.set(std::forward<CallbackT>(callback));
+    any_subscription_callback_.set(callback);
   }
 
 private:
   const std::shared_ptr<rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>>
     p_ros_sub;
   const NodeType nodeType;
-  const rclcpp::AnySubscriptionCallback<CallbackMessageT, AllocatorT> any_subscription_callback;
+  std::shared_ptr<std::allocator<void>> allocator_;
+  const rclcpp::AnySubscriptionCallback<CallbackMessageT, std::allocator<void>>
+    any_subscription_callback_;
   CallbackMessageT message;
 };
 };  // namespace autocore

@@ -61,9 +61,10 @@ public:
     typename AllocatorT = std::allocator<void>,
     typename CallbackMessageT =
       typename rclcpp::subscription_traits::has_message_type<CallbackT>::type,
-    typename SubscriptionT = autocore::Subscription<CallbackT, CallbackMessageT, AllocatorT>,
     typename MessageMemoryStrategyT =
       rclcpp::message_memory_strategy::MessageMemoryStrategy<CallbackMessageT, AllocatorT>,
+    typename SubscriptionT =
+      autocore::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>,
     typename SubRclcppT =
       rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>>
   std::shared_ptr<SubscriptionT> create_subscription1(
@@ -87,7 +88,7 @@ public:
         topic_name, qos, std::forward<CallbackT>(callback), options, msg_mem_strat));
     } else if (IsZenohFlow()) {
       auto p_sub = std::make_shared<SubscriptionT>();
-      p_sub->setCallback(std::forward<CallbackT>(callback));
+      p_sub->setCallback(callback);
       return p_sub;
     } else {
       throw "Unsupported autocore node type: " + GetNodeType();
