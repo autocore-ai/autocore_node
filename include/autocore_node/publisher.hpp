@@ -19,13 +19,13 @@
 
 namespace autocore
 {
-template <typename MessageT, typename AllocatorT = std::allocator<void>> class Publisher
+template <typename MessageT> class Publisher
 {
 public:
   RCLCPP_SMART_PTR_DEFINITIONS(Publisher)
 
   Publisher() : nodeType(NodeType::ZenohFlow) {}
-  Publisher(const std::shared_ptr<rclcpp::Publisher<MessageT, AllocatorT>> ros_pub)
+  Publisher(const std::shared_ptr<rclcpp::Publisher<MessageT>> ros_pub)
   : nodeType(NodeType::ROS), p_ros_pub(ros_pub)
   {
   }
@@ -44,7 +44,7 @@ public:
   MessageT get() const { return message; }
 
 private:
-  const std::shared_ptr<rclcpp::Publisher<MessageT, AllocatorT>> p_ros_pub;
+  const std::shared_ptr<rclcpp::Publisher<MessageT>> p_ros_pub;
   const NodeType nodeType;
   MessageT message;
 };
