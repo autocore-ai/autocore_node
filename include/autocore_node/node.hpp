@@ -42,9 +42,10 @@ public:
     const std::string & topic_name,
     const rclcpp::QoS & qos,
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
-      rclcpp::PublisherOptionsWithAllocator<AllocatorT>())
+      rclcpp::PublisherOptionsWithAllocator<AllocatorT>(),
+    const bool force_ros_type = false)
   {
-    if (IsROS()) {
+    if (force_ros_type || IsROS()) {
       return std::make_shared<PublisherT>(
         rclcpp::Node::create_publisher<MessageT, AllocatorT, PubRclcppT>(topic_name, qos, options));
     } else if (IsZenohFlow()) {
@@ -60,7 +61,7 @@ public:
     typename AllocatorT = std::allocator<void>,
     typename CallbackMessageT =
       typename rclcpp::subscription_traits::has_message_type<CallbackT>::type,
-    typename SubscriptionT = autocore::Subscription<CallbackMessageT, AllocatorT>,
+    typename SubscriptionT = autocore::Subscription<CallbackT, CallbackMessageT, AllocatorT>,
     typename MessageMemoryStrategyT =
       rclcpp::message_memory_strategy::MessageMemoryStrategy<CallbackMessageT, AllocatorT>,
     typename SubRclcppT =
@@ -72,9 +73,10 @@ public:
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
       rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>(),
     typename MessageMemoryStrategyT::SharedPtr msg_mem_strat =
-      (MessageMemoryStrategyT::create_default()))
+      (MessageMemoryStrategyT::create_default()),
+    const bool force_ros_type = false)
   {
-    if (IsROS()) {
+    if (force_ros_type || IsROS()) {
       return std::make_shared<SubscriptionT>(rclcpp::Node::create_subscription<
                                              MessageT,
                                              CallbackT,
@@ -84,8 +86,7 @@ public:
                                              MessageMemoryStrategyT>(
         topic_name, qos, std::forward<CallbackT>(callback), options, msg_mem_strat));
     } else if (IsZenohFlow()) {
-      //TODO: Implete callback in Zenoh Flow.
-      return std::make_shared<SubscriptionT>();
+      return std::make_shared<SubscriptionT>(std::forward<CallbackT>(callback));
     } else {
       throw "Unsupported autocore node type: " + GetNodeType();
     }

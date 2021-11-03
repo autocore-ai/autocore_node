@@ -32,17 +32,20 @@ public:
 
   void publish(const MessageT & msg)
   {
+    message = msg;
     if (nodeType == NodeType::ROS) {
       p_ros_pub->publish(msg);
     } else if (nodeType == NodeType::ZenohFlow) {
-      // TODO: pub in Zenoh Flow
     } else {
       throw "Unsupported autocore node type: " + nodeType;
     }
   }
 
+  MessageT get() const { return message; }
+
 private:
   const std::shared_ptr<rclcpp::Publisher<MessageT, AllocatorT>> p_ros_pub;
   const NodeType nodeType;
+  MessageT message;
 };
 };  // namespace autocore

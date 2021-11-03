@@ -20,6 +20,8 @@
 namespace autocore
 {
 template <
+  typename MessageT,
+  typename CallbackT,
   typename CallbackMessageT,
   typename AllocatorT = std::allocator<void>,
   typename MessageMemoryStrategyT =
@@ -29,16 +31,30 @@ class Subscription
 public:
   RCLCPP_SMART_PTR_DEFINITIONS(Subscription)
 
-  Subscription() : nodeType(NodeType::ZenohFlow) {}
-  Subscription(
-    const std::shared_ptr<rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>>
-      ros_sub)
+  Subscription(CallbackT && callback) : nodeType(NodeType::ZenohFlow)
+  {
+    any_subscription_callback.set(std::forward<CallbackT>(callback));
+  }
+  Subscription(const std::shared_ptr<
+               rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>> ros_sub)
   : nodeType(NodeType::ROS), p_ros_sub(ros_sub)
   {
   }
 
+  void set(const MessageT & msg)
+  {
+    message = msg;
+    if (nodeType == NodeType::ZenohFlow) {
+      rclcpp::MessageInfo msg_info;
+      any_subscription_callback.dispatch(std::make_shared<MessageT>(message), msg_info);
+    }
+  }
+
 private:
-  const std::shared_ptr<rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>> p_ros_sub;
+  const std::shared_ptr<rclcpp::Subscription<CallbackMessageT, AllocatorT, MessageMemoryStrategyT>>
+    p_ros_sub;
   const NodeType nodeType;
+  const rclcpp::AnySubscriptionCallback<MessageT, AllocatorT> any_subscription_callback;
+  MessageT message;
 };
 };  // namespace autocore
