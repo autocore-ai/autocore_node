@@ -44,8 +44,8 @@ public:
   MessageT get() const { return message; }
 
 private:
+  const NodeType nodeType = NodeType::Default;
   const std::shared_ptr<rclcpp::Publisher<MessageT>> p_ros_pub;
-  const NodeType nodeType;
   MessageT message;
 };
-};  // namespace autocore
+}  // namespace autocore

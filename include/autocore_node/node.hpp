@@ -74,4 +74,4 @@ public:
 protected:
   const NodeType nodeType;
 };
-};  // namespace autocore
+}  // namespace autocore

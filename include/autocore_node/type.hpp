@@ -21,4 +21,4 @@ enum NodeType {
   ROS = 0,
   ZenohFlow = 1,
 };
-};  // namespace autocore
+}  // namespace autocore

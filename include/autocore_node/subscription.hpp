@@ -50,10 +50,10 @@ public:
   }
 
 private:
-  const NodeType nodeType;
+  const NodeType nodeType = NodeType::Default;
   const std::shared_ptr<rclcpp::AnySubscriptionCallback<CallbackMessageT, std::allocator<void>>>
     callback_ptr;
   const std::shared_ptr<rclcpp::Subscription<CallbackMessageT>> p_ros_sub;
   CallbackMessageT message;
 };
-};  // namespace autocore
+}  // namespace autocore
