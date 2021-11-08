@@ -27,7 +27,16 @@ Node::Node(const std::string & node_name, const NodeType node_type)
 {
 }
 
-NodeType Node::GetNodeType(){ return nodeType; }
+Node::Node(
+  const std::string & node_name,
+  const std::string & name_space,
+  const rclcpp::NodeOptions & options,
+  const NodeType node_type)
+: rclcpp::Node(node_name, name_space, options), nodeType(node_type)
+{
+}
+
+NodeType Node::GetNodeType() { return nodeType; }
 
 bool Node::IsROS() { return NodeType::ROS == nodeType; }
 

@@ -49,6 +49,8 @@ public:
     callback_ptr->set(std::forward<CallbackT>(callback));
   }
 
+  operator rclcpp::SubscriptionBase &() const { return *p_ros_sub; }
+
 private:
   const NodeType nodeType = NodeType::Default;
   const std::shared_ptr<rclcpp::AnySubscriptionCallback<CallbackMessageT, std::allocator<void>>>

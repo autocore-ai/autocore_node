@@ -43,6 +43,8 @@ public:
 
   MessageT get() const { return message; }
 
+  operator rclcpp::PublisherBase &() const { return *p_ros_pub; }
+
 private:
   const NodeType nodeType = NodeType::Default;
   const std::shared_ptr<rclcpp::Publisher<MessageT>> p_ros_pub;

@@ -28,6 +28,11 @@ public:
     const std::string & node_name,
     const rclcpp::NodeOptions & options,
     const NodeType node_type = NodeType::ROS);
+  explicit Node(
+    const std::string & node_name,
+    const std::string & name_space,
+    const rclcpp::NodeOptions & options,
+    const NodeType node_type = NodeType::ROS);
 
   NodeType GetNodeType();
   bool IsROS();
@@ -35,11 +40,15 @@ public:
 
   template <typename MessageT>
   std::shared_ptr<autocore::Publisher<MessageT>> create_publisher(
-    const std::string & topic_name, const rclcpp::QoS & qos, const bool force_ros_type = false)
+    const std::string & topic_name,
+    const rclcpp::QoS & qos,
+    const rclcpp::PublisherOptionsWithAllocator<std::allocator<void>> & options =
+      rclcpp::PublisherOptionsWithAllocator<std::allocator<void>>(),
+    const bool force_ros_type = false)
   {
     if (force_ros_type || IsROS()) {
       return std::make_shared<autocore::Publisher<MessageT>>(
-        rclcpp::Node::create_publisher<MessageT>(topic_name, qos));
+        rclcpp::Node::create_publisher<MessageT>(topic_name, qos, options));
     } else if (IsZenohFlow()) {
       return std::make_shared<autocore::Publisher<MessageT>>();
     } else {
@@ -47,23 +56,25 @@ public:
     }
   }
 
-  template <typename MessageT, typename CallbackT>
-  std::shared_ptr<
-    autocore::Subscription<typename rclcpp::subscription_traits::has_message_type<CallbackT>::type>>
-  create_subscription(
+  template <
+    typename MessageT,
+    typename CallbackT,
+    typename CallbackMessageT =
+      typename rclcpp::subscription_traits::has_message_type<CallbackT>::type>
+  std::shared_ptr<autocore::Subscription<CallbackMessageT>> create_subscription(
     const std::string & topic_name,
     const rclcpp::QoS & qos,
     CallbackT && callback,
+    const rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> & options =
+      rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>>(),
     const bool force_ros_type = false)
   {
     if (force_ros_type || IsROS()) {
-      return std::make_shared<autocore::Subscription<
-        typename rclcpp::subscription_traits::has_message_type<CallbackT>::type>>(
+      return std::make_shared<autocore::Subscription<CallbackMessageT>>(
         rclcpp::Node::create_subscription<MessageT, CallbackT>(
-          topic_name, qos, std::forward<CallbackT>(callback)));
+          topic_name, qos, std::forward<CallbackT>(callback), options));
     } else if (IsZenohFlow()) {
-      auto p_sub = std::make_shared<autocore::Subscription<
-        typename rclcpp::subscription_traits::has_message_type<CallbackT>::type>>();
+      auto p_sub = std::make_shared<autocore::Subscription<CallbackMessageT>>();
       p_sub->setCallback(callback);
       return p_sub;
     } else {
