@@ -56,6 +56,17 @@ public:
     }
   }
 
+  template <typename MessageT>
+  std::shared_ptr<autocore::Publisher<MessageT>> create_publisher(
+    const std::string & topic_name, const rclcpp::QoS & qos, const bool force_ros_type)
+  {
+    create_publisher<MessageT>(
+      topic_name,
+      qos,
+      rclcpp::PublisherOptionsWithAllocator<std::allocator<void>>(),
+      force_ros_type);
+  }
+
   template <
     typename MessageT,
     typename CallbackT,
