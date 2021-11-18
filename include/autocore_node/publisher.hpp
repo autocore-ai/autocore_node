@@ -32,10 +32,10 @@ public:
 
   void publish(const MessageT & msg)
   {
-    message = msg;
     if (nodeType == NodeType::ROS) {
       p_ros_pub->publish(msg);
     } else if (nodeType == NodeType::ZenohFlow) {
+      message = msg;
     } else {
       throw "Unsupported autocore node type: " + nodeType;
     }

@@ -42,8 +42,7 @@ public:
   std::shared_ptr<autocore::Publisher<MessageT>> create_publisher(
     const std::string & topic_name,
     const rclcpp::QoS & qos,
-    const rclcpp::PublisherOptionsWithAllocator<std::allocator<void>> & options =
-      rclcpp::PublisherOptionsWithAllocator<std::allocator<void>>(),
+    const rclcpp::PublisherOptions & options = rclcpp::PublisherOptions(),
     const bool force_ros_type = false)
   {
     if (force_ros_type || IsROS()) {
@@ -60,11 +59,7 @@ public:
   std::shared_ptr<autocore::Publisher<MessageT>> create_publisher(
     const std::string & topic_name, const rclcpp::QoS & qos, const bool force_ros_type)
   {
-    create_publisher<MessageT>(
-      topic_name,
-      qos,
-      rclcpp::PublisherOptionsWithAllocator<std::allocator<void>>(),
-      force_ros_type);
+    return create_publisher<MessageT>(topic_name, qos, rclcpp::PublisherOptions(), force_ros_type);
   }
 
   template <
@@ -76,8 +71,7 @@ public:
     const std::string & topic_name,
     const rclcpp::QoS & qos,
     CallbackT && callback,
-    const rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>> & options =
-      rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>>(),
+    const rclcpp::SubscriptionOptions & options = rclcpp::SubscriptionOptions(),
     const bool force_ros_type = false)
   {
     if (force_ros_type || IsROS()) {
